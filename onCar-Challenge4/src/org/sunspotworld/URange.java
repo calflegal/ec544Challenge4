@@ -46,7 +46,8 @@ public class URange extends MIDlet {
     private static final int SERVO_CENTER_VALUE = 1500;
         private static final int SERVO2_HIGH = 10; //speeding step high
     private static final int SERVO2_LOW = 5; //speeding step low
-        private static final int SERVO2_MAX_VALUE = 1600;
+        private static final int SERVO2_MAX_VALUE = 2000;
+        private static final int SERVO2_MIN_VALUE = 1500;
     
     public static final double voltage = 5.0; 
     public static final double scaleFactor = voltage/512;
@@ -57,7 +58,7 @@ public class URange extends MIDlet {
     private ITriColorLEDArray leds = (ITriColorLEDArray) Resources.lookup(ITriColorLEDArray.class);
     protected void startApp() throws MIDletStateChangeException {
         servo1.setValue(SERVO_CENTER_VALUE-200);
-        servo2.setValue(SERVO_CENTER_VALUE);
+        servo2.setValue(SERVO2_MAX_VALUE);
         RadiogramConnection rCon = null;
         Datagram dg = null;
         BootloaderListenerService.getInstance().start();   // monitor the USB (if connected) and recognize commands from host
@@ -73,8 +74,8 @@ public class URange extends MIDlet {
         
 
    while(true){
-       forward();
-        try {
+      forward();
+       try {
             try {
             // Open up a broadcast connection to the host port
             // where the 'on Desktop' portion of this demo is listening
@@ -94,12 +95,11 @@ public class URange extends MIDlet {
                 dg.writeDouble(inchesCarRight);
                 System.out.println("Sending datagram: " +inchesCarLeft + " " + inchesCarRight);
                 rCon.send(dg);
-                Utils.sleep(50);
+               // Utils.sleep(50);
             } catch (IOException ex){
                 ex.printStackTrace();
             }
-          //  Utils.sleep(100);
-     //       notifyDestroyed();
+        
         }
      }
 
@@ -116,25 +116,26 @@ public class URange extends MIDlet {
     protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
     }
     private void forward() {
-        System.out.println("forward");
+        System.out.println("backward");
         //servo1.setValue(0);
-        current2= servo2.getValue();
+        current2 = servo2.getValue();
 
         for (int i=0;i<3;i++){
-            current2= servo2.getValue();
-            if (current2 + step2 <SERVO2_MAX_VALUE){
-                servo2.setValue(current2+step2);
+            current2 = servo2.getValue();
+            if (current2 -step2>SERVO2_MIN_VALUE){
+                servo2.setValue(current2-step2);
+                System.out.println(servo2.getValue());
                 Utils.sleep(50);
             } else {
-                servo2.setValue(SERVO2_MAX_VALUE);
+                servo2.setValue(SERVO2_MIN_VALUE);
+                System.out.println(servo2.getValue());
                 Utils.sleep(50);
             }
-        }
-            
-  /*     while(current2 + step2 <SERVO2_MAX_VALUE){
-            servo2.setValue(current2+step2);
-            current2= servo2.getValue();
-            Utils.sleep(50);
-         }*/
+        } 
+    /*    while (current2 - step2 > SERVO2_MIN_VALUE){
+        servo2.setValue(current2-step2);
+        current2 = servo2.getValue();
+        Utils.sleep(50);
+                }*/
     }
 }
