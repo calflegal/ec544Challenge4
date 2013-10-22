@@ -47,9 +47,9 @@ public class URange extends MIDlet {
         private static final int SERVO2_HIGH = 10; //speeding step high
     private static final int SERVO2_LOW = 5; //speeding step low
         private static final int SERVO2_MAX_VALUE = 2000;
-        private static final int SERVO2_MIN_VALUE = 1530;
+        private static final int SERVO2_MIN_VALUE = 1450;
          private int current1 = SERVO_CENTER_VALUE;
-         private static final int SERVO1_MAX_VALUE = 1800;
+         private static final int SERVO1_MAX_VALUE = 1530;
     private static final int SERVO1_MIN_VALUE = 1400;
     private static final int SERVO1_HIGH = 20; //steering step high
     private static final int SERVO1_LOW = 10; //steering step low
@@ -63,7 +63,7 @@ public class URange extends MIDlet {
     private int step2 = SERVO2_LOW;
     private ITriColorLEDArray leds = (ITriColorLEDArray) Resources.lookup(ITriColorLEDArray.class);
     protected void startApp() throws MIDletStateChangeException {
-        servo1.setValue(SERVO_CENTER_VALUE-200);
+        servo1.setValue(SERVO_CENTER_VALUE-205);
         servo2.setValue(SERVO2_MAX_VALUE);
         RadiogramConnection rCon = null;
         Datagram dg = null;
@@ -94,27 +94,23 @@ public class URange extends MIDlet {
            //    Utils.sleep(250);
                 double inchesCarRight = (rightCarSensor.getVoltage()/scaleFactor);
                 double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
-                if (inchesCarRight < 35) {
+                if (inchesCarRight < 32) {
                     right();
                 }
-                else if (inchesCarLeft < 35) {
+                else if (inchesCarLeft < 32) {
                     left();
                 }
                 else {
                     forward();
                     System.out.println("Forward");
                 }
-                dg.reset();
-                //enoc
-                dg.writeDouble(inchesCarLeft);
-                dg.writeDouble(inchesCarRight);
-                System.out.println("Sending datagram: " +inchesCarLeft + " " + inchesCarRight);
-                rCon.send(dg);
                // Utils.sleep(50);
             } catch (IOException ex){
                 ex.printStackTrace();
             }
+     //  Utils.sleep(50);
         }
+   
      }
 
     protected void pauseApp() {
@@ -130,7 +126,6 @@ public class URange extends MIDlet {
     protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
     }
     private void forward() {
-        System.out.println("backward");
         //servo1.setValue(0);
         current2 = servo2.getValue();
 
@@ -138,11 +133,11 @@ public class URange extends MIDlet {
             current2 = servo2.getValue();
             if (current2 -step2>SERVO2_MIN_VALUE){
                 servo2.setValue(current2-step2);
-                System.out.println(servo2.getValue());
+                System.out.println("Servo at: " + servo2.getValue());
                Utils.sleep(100);
             } else {
                 servo2.setValue(SERVO2_MIN_VALUE);
-                System.out.println(servo2.getValue());
+                System.out.println("Servo at: " + servo2.getValue());
                 Utils.sleep(100);
             }
         } 
