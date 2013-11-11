@@ -6,6 +6,7 @@
 
 package org.sunspotworld;
 
+import java.io.IOException;
 import com.sun.spot.io.j2me.radiogram.*;
 import com.sun.spot.peripheral.radio.RadioFactory;
 import com.sun.spot.resources.Resources;
@@ -77,11 +78,7 @@ public class URange extends MIDlet {
         ITriColorLED led = leds.getLED(0);
         led.setRGB(100,0,0);   // set color to moderate red
         //start_wheels
-        
-
-   while(true){
-       try {
-            try {
+        try {
             // Open up a broadcast connection to the host port
             // where the 'on Desktop' portion of this demo is listening
             rCon = (RadiogramConnection) Connector.open("radiogram://broadcast:" + HOST_PORT);
@@ -90,10 +87,18 @@ public class URange extends MIDlet {
             System.err.println("Caught " + e + " in connection initialization.");
             notifyDestroyed();
         }
+
+   while(true){
+       try {
+            
            //    led.setOn();                        // Blink LED
            //    Utils.sleep(250);
+           dg.reset();
                 double inchesCarRight = (rightCarSensor.getVoltage()/scaleFactor);
                 double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
+                dg.writeDouble(inchesCarLeft);
+                dg.writeDouble(inchesCarRight);
+                rCon.send(dg);
                 if (inchesCarRight < 32) {
                     right();
                 }
